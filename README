@@ -6,4 +6,4 @@ Downloading Python 3 will also install pip, which one will need to install scrap
 
 Personally, I write and edit my scripts using PyCharm, which one can get from JetBrains with an educational license (using one's .edu email address) but there are certainly other ways to do the same thing.
 
-Once everything is setup, one should be able to get the list of urls from scrapy/seCrawler, which will create a file called urls.txt. From there, one should just have to change one line of code in order to run the script for the new list of urls. Make sure to download the 3000words.txt file to the directory you are running the script from as this is the file I use as the english dictionary.
+Once everything is setup, one should be able to get the list of urls from scrapy/seCrawler, which will create a file called urls.txt. From there, one should just have to change one line of code in order to run the script for the new list of urls. Make sure to download the 3000words.txt file and pdftotext.exe to the directory you are running the script from as this is the file I use as the english dictionary.
