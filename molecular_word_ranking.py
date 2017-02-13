@@ -24,7 +24,7 @@ def read_url_list_from_file(filename):
 
 
 def strip_unwanted_characters_and_split(text):
-    chars_to_remove = ['\n', ',', '"', '.', '"', ':', '(', ')', '<', '>', '[', ';', ']', '!', '\\', '_', '=', '"', '/']
+    chars_to_remove = ['\n', '{', '}', ',', '(', ')', '+']
     text1 = ''.join([c if c not in chars_to_remove else ' ' for c in text])
     return [c for c in text1.split(' ') if c != '']
 
@@ -52,6 +52,9 @@ def get_words(url):
     if page_data.code != 200:
         return []
     soup = BeautifulSoup(page_data, 'html.parser')
+    # kill all script and style elements
+    for script in soup(["script", "style"]):
+        script.decompose()  # rip it out
     text = soup.get_text(' ', strip=True).lower().replace('’', "'")
     return strip_unwanted_characters_and_split(text)
 
@@ -60,16 +63,16 @@ def read_list_from_file(filename):
     with open(filename) as f:
         return set(([word.strip('\n') for word in f.readlines()]))
 
-inter_request_interval_in_seconds = 5
+inter_request_interval_in_seconds = 2
 bad_words = ['ncbi', 'sciencedirect', 'eypsb.us']
-urls = read_url_list_from_file('stem_cell_metabolism_urls.txt')
+urls = list(set(read_url_list_from_file('pkd2_gene_expression.txt')))
 pdf_urls = [url for url in urls if url.endswith('.pdf')]
 bad_words_removed = [url for url in urls if not any(bad_word in url for bad_word in bad_words)]
 print(len(urls))
 print(len(pdf_urls))
 print(len(bad_words_removed))
 
-english = read_list_from_file('3000words.txt')
+english = read_list_from_file('5000words.txt')
 all_words_combined = []
 next_request_time = time.time()
 
@@ -80,12 +83,15 @@ for link in bad_words_removed:
     try:
         print('Processing {0}'.format(link))
         words = get_words(link)
+        words = [word for word in words if len(word) > 2]
         next_request_time = time.time() + inter_request_interval_in_seconds
     except urllib.error.HTTPError as err:
         print('{0} on {1}'.format(type(err), link))
     except urllib.error.URLError as err:
         print('{0} on {1}'.format(type(err), link))
     except ValueError as err:
+        print('{0} on {1}'.format(type(err), link))
+    except TimeoutError as err:
         print('{0} on {1}'.format(type(err), link))
 
     final_word_list = [word for word in words if word not in english]
@@ -94,7 +100,7 @@ for link in bad_words_removed:
 
 ranked_words = Counter(all_words_combined).most_common()
 dict(ranked_words)
-with open('output.csv', 'w') as outfile:
+with open('pkd2geneexpressionresults_5000.csv', 'w') as outfile:
     for value in ranked_words:
         try:
             outfile.write('{0},{1}\n'.format(value[0], value[1]))
