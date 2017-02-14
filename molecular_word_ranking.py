@@ -24,9 +24,9 @@ def read_url_list_from_file(filename):
 
 
 def strip_unwanted_characters_and_split(text):
-    chars_to_remove = ['\n', '{', '}', ',', '(', ')', '+']
+    chars_to_remove = ['\n', '"', '.', '“', ':', ',', '<', '>', '[', ';', ']', '!', '(', ')', '\\', '_', '=', '”', '/']
     text1 = ''.join([c if c not in chars_to_remove else ' ' for c in text])
-    return [c for c in text1.split(' ') if c != '']
+    return [c for c in text1.split(' ') if len(c) > 1]
 
 
 def get_words_from_pdf(url):
